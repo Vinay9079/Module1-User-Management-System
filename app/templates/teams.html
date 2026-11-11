@@ -1,0 +1,163 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Team Management</h3>
+
+
+<!-- Create Team -->
+
+{% if is_admin %}
+
+<h4>Create Team</h4>
+
+<form method="post">
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input
+        name="team_name"
+        placeholder="Team name"
+        required
+    >
+
+    <input
+        name="description"
+        placeholder="Description (optional)"
+    >
+
+    <button type="submit">Create Team</button>
+
+</form>
+
+{% endif %}
+
+
+<!-- Existing Teams -->
+
+{% for team in teams %}
+
+<hr>
+
+<h4>{{ team.team_name }}</h4>
+
+<p>{{ team.description or "No description" }}</p>
+
+
+<!-- Update Team -->
+
+{% if current_user.has_role('Administrator') or current_user.has_role('Team Lead / Supervisor') %}
+
+<form
+    method="post"
+    action="{{ url_for('teams.update_team', team_id=team.id) }}"
+>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input
+        name="team_name"
+        value="{{ team.team_name }}"
+        required
+    >
+
+    <input
+        name="description"
+        value="{{ team.description or '' }}"
+    >
+
+    <button type="submit">Update Team</button>
+
+</form>
+
+{% endif %}
+
+
+<!-- Team Members -->
+
+<h4>Members</h4>
+
+<ul>
+
+    {% for link in team.members %}
+
+    <li>
+
+        {{ link.user.name }} ({{ link.user.email }})
+
+        {% if current_user.has_role('Administrator') or current_user.has_role('Team Lead / Supervisor') %}
+
+        <!-- Remove Member -->
+
+        <form
+            class="inline"
+            method="post"
+            action="{{ url_for('teams.remove_member', team_id=team.id, user_id=link.user.id) }}"
+        >
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <button type="submit">Remove</button>
+
+        </form>
+
+        {% endif %}
+
+    </li>
+
+    {% else %}
+
+    <li>No members assigned.</li>
+
+    {% endfor %}
+
+</ul>
+
+
+<!-- Add Team Member -->
+
+{% if current_user.has_role('Administrator') or current_user.has_role('Team Lead / Supervisor') %}
+
+<form
+    method="post"
+    action="{{ url_for('teams.add_member', team_id=team.id) }}"
+>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input
+        type="number"
+        name="user_id"
+        placeholder="Security Analyst or Team Lead user ID"
+        min="1"
+        required
+    >
+
+    <button type="submit">Add Team Member</button>
+
+</form>
+
+{% endif %}
+
+
+<!-- Delete Team -->
+
+{% if is_admin %}
+
+<form
+    method="post"
+    action="{{ url_for('teams.delete_team', team_id=team.id) }}"
+>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <button type="submit">Delete Team</button>
+
+</form>
+
+{% endif %}
+
+{% endfor %}
+
+{% endblock %}

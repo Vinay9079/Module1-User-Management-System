@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Module 1 User Management{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1050px; margin: 30px auto;
+               padding: 0 18px; color: #222; background: #f5f6f8; }
+        header, main { background: white; padding: 20px; border-radius: 8px; margin-bottom: 16px; }
+        nav a { margin-right: 14px; color: #174ea6; text-decoration: none; }
+        input, select, button { padding: 9px; margin: 5px 0; max-width: 100%; }
+        input, select { border: 1px solid #bbb; border-radius: 4px; }
+        button { cursor: pointer; border: 0; border-radius: 4px; background: #174ea6; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 9px; text-align: left; }
+        .message { padding: 10px; background: #eef3ff; margin: 8px 0; }
+        .error { background: #ffecec; } .success { background: #eaf8ed; }
+        .inline { display: inline-block; margin-right: 8px; }
+        .muted { color: #666; }
+    </style>
+</head>
+<body>
+<header>
+    <h2>Module 1 – User Management</h2>
+    {% if current_user.is_authenticated %}
+    <nav>
+        <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('auth.profile') }}">Profile</a>
+        <a href="{{ url_for('auth.change_password') }}">Change password</a>
+        <a href="{{ url_for('teams.list_teams') }}">Teams</a>
+        {% if current_user.has_role('Administrator') %}
+            <a href="{{ url_for('main.users') }}">Users</a>
+            <a href="{{ url_for('audit.audit_logs') }}">Audit logs</a>
+        {% endif %}
+        <form class="inline" method="post" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Logout</button>
+</form>
+    </nav>
+    {% endif %}
+</header>
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

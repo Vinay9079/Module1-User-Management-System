@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Audit Logs</h3>
+<form method="get">
+    <input name="user_id" placeholder="Actor user ID">
+    <input name="action" placeholder="Action contains...">
+    <select name="status">
+        <option value="">Any status</option>
+        <option value="success">Success</option>
+        <option value="failed">Failed</option>
+    </select>
+    <label>From <input type="date" name="date_from"></label>
+    <label>To <input type="date" name="date_to"></label>
+    <button type="submit">Filter</button>
+</form>
+<table>
+<tr><th>Time</th><th>Actor ID</th><th>Action</th><th>Target</th><th>Status</th><th>Details</th></tr>
+{% for log in logs %}
+<tr>
+<td>{{ log.timestamp }}</td><td>{{ log.actor_user_id or "Unknown" }}</td>
+<td>{{ log.action }}</td><td>{{ log.target_type or "" }} {{ log.target_id or "" }}</td>
+<td>{{ log.status }}</td><td>{{ log.details or "" }}</td>
+</tr>
+{% else %}
+<tr><td colspan="6">No audit records found.</td></tr>
+{% endfor %}
+</table>
+<p class="muted">Showing up to 250 recent records. Audit records are view-only in this application.</p>
+{% endblock %}

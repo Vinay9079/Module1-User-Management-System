@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Dashboard</h3>
+<p>Welcome, <strong>{{ current_user.name }}</strong>.</p>
+<p>Email: {{ current_user.email }}</p>
+<p>Username: {{ current_user.username }}</p>
+<p>Account status: {{ current_user.status }}</p>
+<p>Your role(s): {{ current_user.role_names|join(", ") }}</p>
+{% if current_user.has_role('Security Analyst') %}
+<p>You can use the security monitoring and investigation features assigned to you.</p>
+{% endif %}
+{% if current_user.has_role('Team Lead / Supervisor') %}
+<p>You can view and oversee your assigned teams.</p>
+{% endif %}
+{% if current_user.has_role('Administrator') %}
+<p>You can manage user accounts, roles, teams and audit logs.</p>
+{% endif %}
+{% endblock %}
